@@ -15,19 +15,71 @@ Including another URLconf
 """
 from django.contrib.auth import views as auth_views
 from django.contrib import admin
-from django.conf.urls import url, include
+from django.conf.urls import include
+from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from users import views as users_views
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url('register/', users_views.register, name='register'),
-    url('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
-    url('logout/', auth_views.LogoutView.as_view(template_name='users/logout.html'), name='logout'),
-    url('profile/', users_views.profile, name='profile'),
-    url('', include('blog.urls'))
+    path('admin/', admin.site.urls),
+    # url(r'^', include('django.contrib.auth.urls')),
+    path('register/', users_views.register, name='register'),
+    path('password-reset/',
+         auth_views.PasswordResetView.as_view(
+             template_name='users/password_reset.html',
+         ),
+         name='password_reset'),
+    path('password-reset/done/',
+         auth_views.PasswordResetDoneView.as_view(
+             template_name='users/password_reset_done.html'
+         ),
+         name='password_reset_done'),
+    path('password-reset-confirm/<uidb64>/<token>/',
+         auth_views.PasswordResetConfirmView.as_view(
+             template_name='users/password_reset_confirm.html'),
+         name='password_reset_confirm'),
+    path('password-reset-complete/',
+         auth_views.PasswordResetCompleteView.as_view(
+             template_name='users/password_reset_complete.html',
+         ),
+         name='password_reset_complete'),
+    path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(template_name='users/logout.html'), name='logout'),
+    path('profile/', users_views.profile, name='profile'),
+    path('', include('blog.urls'))
 ]
 
+# urlpatterns = [
+#     url('password-reset-confirm/<uidb64>/<token>/',
+#         auth_views.PasswordResetConfirmView.as_view(
+#             template_name='users/registration/password_reset_confirm.html',
+#             success_url='users/password_reset_complete'),
+#         name='password_reset_confirm'),
+#     url(r'^admin/', admin.site.urls),
+#     # url(r'^', include('django.contrib.auth.urls')),
+#     url('register/', users_views.register, name='register'),
+#     url('password-reset/done/',
+#         auth_views.PasswordResetDoneView.as_view(
+#             template_name='users/registration/password_reset_done.html'
+#         ),
+#         name='password_reset_done'),
+#     url('password-reset/',
+#         auth_views.PasswordResetView.as_view(
+#             template_name='users/registration/password_reset.html',
+#         ),
+#         name='password_reset'),
+#     url('password-reset-complete/',
+#         auth_views.PasswordResetCompleteView.as_view(
+#             template_name='users/registration/password_reset_complete.html',
+#         ),
+#         name='password_reset_complete'),
+#     url('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
+#     url('logout/', auth_views.LogoutView.as_view(template_name='users/logout.html'), name='logout'),
+#     url('profile/', users_views.profile, name='profile'),
+#     url('', include('blog.urls'))
+# ]
+
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
